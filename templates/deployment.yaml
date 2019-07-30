@@ -1,0 +1,51 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ include "grafana-chart.fullname" . }}
+  namespace: {{ .Values.deployment.namespace }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "grafana-chart.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      securityContext:
+       fsGroup: 472
+       runAsUser: 472
+       runAsNonRoot: true
+      containers:
+      - name: {{ .Chart.Name }}
+        image: {{ .Values.image.repository}}:{{ .Values.image.tag }}
+        env: 
+          - name: GF_SECURITY_ADMIN_USER  ##secret value for username ==>
+            valueFrom:
+              secretKeyRef:
+                name: grafana-secret  ## <== username from secret
+                key: username
+          - name: GF_SECURITY_ADMIN_PASSWORD ##secret value for password ==>
+            valueFrom:
+              secretKeyRef:
+                name: grafana-secret ## <== secret value for password 
+                key: password
+        ports:
+          - containerPort: 3000
+        volumeMounts:
+          - name: grafana-config   ###data for configmap ---->>
+            mountPath: /var/lib/grafana/dashboards
+          - name: grafana-config  ###data for configmap ---->>
+            mountPath: /grafana/
+          - mountPath: /etc/grafana/provisioning/dashboards
+            name: grafana-config
+            readOnly: true
+          - mountPath: /etc/grafana/provisioning/datasources/
+            name: grafana-config
+            readOnly: true
+      volumes:
+        - configMap:
+            name: grafana-config ## <<--- data for configmap
+          name: grafana-config
+        - name: grafana-pv-storage #### <<---- claiming share
+          persistentVolumeClaim:
+           claimName: grafana-pv-claim ## CLAIM
