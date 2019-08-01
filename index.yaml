@@ -1,0 +1,13 @@
+apiVersion: v1
+entries:
+  grafana-chart:
+  - apiVersion: v1
+    appVersion: "1.0"
+    created: "2019-08-01T04:16:13.695915264Z"
+    description: A Helm chart for Kubernetes
+    digest: 2e8d03b832614784eb0892ca70d59177a955c46c1a0e370b4706ae59b3932857
+    name: grafana-chart
+    urls:
+    - https://nurlan199206.github.io/grafana-chart/grafana-chart-0.1.0.tgz
+    version: 0.1.0
+generated: "2019-08-01T04:16:13.695079861Z"
